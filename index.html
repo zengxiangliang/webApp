@@ -26,7 +26,7 @@
 	</header>
 
 	<div id='content'>
-		<div>
+		<div>   <!--important ,don't delete this tag-->
 		<h2>test</h2>
 		<p>测试测试测试</p>
 		<p>测试测试测试</p>
@@ -70,11 +70,18 @@
 
 var webApp = new webApper({
 
-	contentId:'content',
-	screenId:'screen',
+	contentId:'content',		
+	//id of the scroll wrap
+	screenId:'screen',			
+	//id of the main(of course sliderBar not be included)
 	sliderBarId:'sliderBar',
+	//id of your sliderBar
 	navContralId:'navContral',
+	//button you can callout sliderBar
 	sliderBarWidth:'70p'
+	//width of your sliderBar
+	//'70p' means 70% of the browser width
+	//you can also use '70px' means width is fixed '70px'
 
 
 });

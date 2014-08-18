@@ -68,17 +68,26 @@ function webApper(options) {
 	var content = document.getElementById(options.contentId),
 		navContral = document.getElementById(options.navContralId),
 		screen = document.getElementById(options.screenId),
-		scroll = content.children[0];
+		sliderBar = document.getElementById(options.sliderBarId),
+		scroll = content.children[0],
+		navWidth;
 
 
 	var setup = function(){
 
 	if (!browser.screen) _setup();
-
+	var tmpWidth = options.sliderBarWidth.indexOf('x') === -1 ? 
+				   browser.screen.width * parseInt(options.sliderBarWidth) / 100 :
+				   parseInt(options.sliderBarWidth);
 	content.style.height = browser.screen.height - 
 						  content.nextSibling.nextSibling.offsetHeight -
 						  content.previousSibling.previousSibling.offsetHeight +
 						  'px';
+
+	if (sliderBar && tmpWidth) {
+		sliderBar.style.width = tmpWidth + 'px';
+		navWidth = ~~tmpWidth;
+	}
 	max = content.offsetHeight - scroll.offsetHeight;
 	}
 
@@ -194,7 +203,7 @@ function webApper(options) {
     			|| scroll.style.msTransform
     			|| scroll.style.OTransform
     			|| scroll.style.transform
-            	|| '0,0';
+            	|| '0,0';    // 啊~我卖了个萌
 
     		//not Very good solution
     		position = parseInt(t.substring(t.indexOf(',') + 1)) || 0; 
@@ -255,7 +264,7 @@ function webApper(options) {
     			translate(screen, 0, 0);
     			navVisiable = 0;
     		} else {
-    			translate(screen, 200, 0);
+    			translate(screen, navWidth, 0);
     			navVisiable = 1;
     		}
     	}
@@ -266,5 +275,11 @@ function webApper(options) {
 
 	window.addEventListener('resize', events, false);
 	document.body.addEventListener('touchstart', events, false);
-	if (navContral) navContral.addEventListener('touchstart', events, false);
+	if (navContral) {
+		if(browser.touch) {
+			navContral.addEventListener('touchstart', events, false);
+		}else{
+			navContral.addEventListener('click', events, false);
+		}
+	}
 }
