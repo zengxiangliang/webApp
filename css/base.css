@@ -1,12 +1,23 @@
-body{margin:0;padding:0}
-main{position: relative;z-index: 0}
-nav{width: 100%;height: 400px;overflow: hidden;background: red;position: relative;}
-header{width: 100%;height: 50px;background: blue}
-footer{width: 100%;height: 50px;background: black}
-nav div{width: 70%;height: 8000px;background: green;margin: 0 auto;position: relative;}
+body,main,header,footer,nav,i,div,ul,li,h2{margin:0;padding:0}
+body{width: 100%;overflow: hidden;}
+main{position: relative;z-index: 0;transition:all .5s ease;}
+#content {width: 100%;height: 400px;overflow: hidden;background: red;position: relative;}
+header{width: 100%;height: 50px;background: blue;padding-top: 10px;}
+footer{width: 100%;height: 50px;background: black;}
+button{
+	display: block;
+	margin:10px;
+	height: 30px;
+}
+li{color:white;display: inline;float: left;width: 33.33%;}
+#content div{transition-timing-function:ease-out;width: 100%;height: 8000px;background: green;margin: 0 auto;position: relative;}
 i{background: yellow;}
+p{font-size: 50px;}
 #sliderBar{
 	position: absolute;
 	z-index: -1;
 	top: 0;
+	background: yellow;
+	height: 100%;
+	width: 100%;
 }

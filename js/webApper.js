@@ -42,13 +42,13 @@ Github:https://github.com/powy1993/
 
 			switch (true) {
 				case !!testCss.webkitTransition:
-				return '-webkit-'; break;
-				case !!testCss.mozTransition:
-				return '-moz-'; break;
+				return 'webkit'; break;
+				case !!testCss.MozTransition:
+				return 'Moz'; break;
 				case !!testCss.msTransition:
-				return '-ms-'; break;
-				case !!testCss.oTransition:
-				return '-o-'; break;
+				return 'ms'; break;
+				case !!testCss.OTransition:
+				return 'O'; break;
 				default:
 				return '';
 			}
@@ -60,27 +60,105 @@ Github:https://github.com/powy1993/
 function webApper(options) {
 
 	if (!browser.addEventListener ||
-		!browser.touch  || 
 		!options.contentId ) return;
 
 	var noop = function() {}; 
 	var offloadFn = function(fn) { setTimeout(fn || noop, 0) }; 
 
-	var scroll = document.getElementById(options.contentId);
+	var content = document.getElementById(options.contentId),
+		navContral = document.getElementById(options.navContralId),
+		screen = document.getElementById(options.screenId),
+		scroll = content.children[0];
 
 
 	var setup = function(){
 
-	scroll.style.height = browser.screen.height - 
-						  scroll.nextSibling.nextSibling.offsetHeight -
-						  scroll.previousSibling.previousSibling.offsetHeight +
+	if (!browser.screen) _setup();
+
+	content.style.height = browser.screen.height - 
+						  content.nextSibling.nextSibling.offsetHeight -
+						  content.previousSibling.previousSibling.offsetHeight +
 						  'px';
+	max = content.offsetHeight - scroll.offsetHeight;
 	}
 
-	var events = {
+	function _setup() {
+
+		browser.screen.width = document.documentElement.clientWidth;
+		browser.screen.height = document.documentElement.clientHeight;
+		setup();
+
+	}
+
+	var Core = browser.cssCore;
+
+	function setDuration(obj, speed) {
+
+		var style = obj && obj.style;
+		if (!style) return;
+
+		if (Core === 'webkit') {
+			style.webkitTransitionDuration = speed + 'ms';
+			return;
+		}
+
+		style.transitionDuration=
+    	style.MozTransitionDuration =
+    	style.msTransitionDuration =
+    	style.OTransitionDuration = speed + 'ms';
+
+	}
+
+	function translate(obj, distx, disty) {
+
+		var style = obj && obj.style;
+		if (!style) return;
+
+		switch (Core) {
+			case 'webkit':
+			style.webkitTransform = 'translate(' + distx + 'px,' + disty + 'px)' +
+									'translateZ(0)';
+			break;
+			case 'Moz':
+			style.MozTransform = 'translate(' + distx +'px,' + disty + 'px)';
+			break;
+			case 'ms':
+			style.msTransform = 'translate(' + distx +'px,' + disty + 'px)';
+			break;
+			case 'O':
+			style.OTransform = 'translate(' + distx +'px,' + disty + 'px)';
+			break;
+			default:
+			style.trannform = 'translate(' + distx +'px,' + disty + 'px)';
+			break;
+		}
+		
+	}
+
+	var start = {},
+		delta = {},
+		position = 0,
+		tmp = 0,
+		max,
+		navVisiable = 0;
+		events = {
 
 		handleEvent: function(event) {
 
+			if (event.type ==='resize') {
+				offloadFn(_setup);
+				return;} 
+			if (event.target.id === options.navContralId) {
+				this.nav(event);
+				return;
+			}
+
+			if (event.target.tagName.toLowerCase() ==='body') {
+				// do something
+				event.preventDefault();
+
+				return;
+			}
      		switch (event.type) {
        		case 'touchstart': this.start(event); break;
         	case 'touchmove': this.move(event); break;
@@ -90,18 +168,103 @@ function webApper(options) {
         	case 'oTransitionEnd':
         	case 'otransitionend':
         	case 'transitionend': offloadFn(this.transitionEnd(event)); break;
-        	case 'resize': offloadFn(setup); break;
       		}
+
     	},
 
     	start: function(event) {
-    		alert(1);
+            
+    		event.preventDefault();
+    		var touches = event.touches[0],
+    			t;
+    		start = {
+    			x : touches.pageX,
+    			y : touches.pageY,
+    			time : +new Date
+    		}
+    		if (navVisiable = 1) {
+    			translate(screen , 0, 0)
+    			navVisiable = 0
+    		};
+    		setDuration(scroll,0);
+    		delta = {};
+
+    		t = scroll.style.webkitTransform
+    			|| scroll.style.MozTransform
+    			|| scroll.style.msTransform
+    			|| scroll.style.OTransform
+    			|| scroll.style.transform
+            	|| '0,0';
+
+    		//not Very good solution
+    		position = parseInt(t.substring(t.indexOf(',') + 1)) || 0; 
+
+
+    		scroll.addEventListener('touchmove', events, false);
+    		scroll.addEventListener('touchend', events, false);
+
+    	},
+
+    	move: function(event) {
+
+			
+    		if( event.touches.length > 1 ||
+    			event.scale & event.scale !== 1) return;
+
+    		  //stop scroll
+    		var touches = event.touches[0];
+    		delta = {
+    			x : touches.pageX - start.x,
+    			y : touches.pageY - start.y
+    		}
+
+    		tmp = position + delta.y;
+
+    		tmp = tmp > 0 || tmp < max ? tmp > 0 ? tmp / 3 
+    			: max + (tmp - max) / 3 : tmp;   //fix tmp if outof bounding
+
+    		tmp = tmp >> 0;
+    		translate(scroll, 0, tmp);
+    	},
+
+    	end: function(event){
+
+    		if(!delta.y) return;
+
+    		var duration =  +new Date - start.time;
+
+    		position = tmp > 0 || tmp < max ? tmp > 0 ? 0
+            : max : Math.abs(delta.y / duration) < 0.75 ? tmp : tmp + delta.y / duration * 280 ;  // 220滚动系数
+
+    		position = position >> 0;
+    		setDuration(scroll,300);
+    		translate(scroll, 0, position);
+
+    		if (position > 0 || position < max){
+    			if (position > 0) {
+    				position = 0;
+    			} else {
+    				position = max;
+    			}
+    			translate(scroll, 0, position);
+    		}
+    	},
+    	nav: function(event) {
+    		event.stopPropagation();
+    		if (navVisiable) {
+    			translate(screen, 0, 0);
+    			navVisiable = 0;
+    		} else {
+    			translate(screen, 200, 0);
+    			navVisiable = 1;
+    		}
     	}
 
 	}
 
 	setup();
 
-	window.addEventListener('resize', setup, false);
-	scroll.children[0].addEventListener('touchstart', events, false);
+	window.addEventListener('resize', events, false);
+	document.body.addEventListener('touchstart', events, false);
+	if (navContral) navContral.addEventListener('touchstart', events, false);
 }
