@@ -153,7 +153,7 @@ function webApper(options) {
 		events = {
 
 		handleEvent: function(event) {
-
+			
 			if (event.type ==='resize') {
 				offloadFn(_setup);
 				return;} 
@@ -259,6 +259,7 @@ function webApper(options) {
     		}
     	},
     	nav: function(event) {
+            
     		event.stopPropagation();
     		if (navVisiable) {
     			translate(screen, 0, 0);
@@ -267,14 +268,17 @@ function webApper(options) {
     			translate(screen, navWidth, 0);
     			navVisiable = 1;
     		}
+            
     	}
 
 	}
 
 	setup();
+	setDuration(screen, 500);
 
 	window.addEventListener('resize', events, false);
 	document.body.addEventListener('touchstart', events, false);
+
 	if (navContral) {
 		if(browser.touch) {
 			navContral.addEventListener('touchstart', events, false);

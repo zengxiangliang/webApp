@@ -1,13 +1,14 @@
 body,main,header,footer,nav,i,div,ul,li,h2{margin:0;padding:0}
 body{width: 100%;overflow: hidden;}
-main{position: relative;z-index: 0;transition:all .5s ease;}
+#screen{position: relative;z-index: 0;transition-timing-function:ease-in;}
 #content {width: 100%;height: 400px;overflow: hidden;background: red;position: relative;}
 header{width: 100%;height: 50px;background: blue;padding-top: 10px;}
 footer{width: 100%;height: 50px;background: black;}
-button{
+span{
 	display: block;
 	margin:10px;
 	height: 30px;
+	background: white;
 }
 li{color:white;display: inline;float: left;width: 33.33%;}
 #content div{transition-timing-function:ease-out;width: 100%;height: 8000px;background: green;margin: 0 auto;position: relative;}
